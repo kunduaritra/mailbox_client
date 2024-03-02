@@ -1,9 +1,16 @@
 import React, { useRef, useState } from "react";
 import { Card, Container, Row, Col, Form, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { authActions } from "./../store/auth-slice";
+import { HashLoader } from "react-spinners";
 
 const Authentication = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const inputEmailRef = useRef();
   const inputPasswordRef = useRef();
   const inputConfirmPasswordRef = useRef();
@@ -55,6 +62,7 @@ const Authentication = () => {
 
   const loginHandler = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     if (inputEmailRef.current.value && inputPasswordRef.current.value) {
       try {
         const res = await fetch(
@@ -71,7 +79,8 @@ const Authentication = () => {
         if (res.ok) {
           console.log("SuccessFully Logged In");
           const data = await res.json();
-          localStorage.setItem("token", data.idToken);
+          dispatch(authActions.login(data));
+          navigate("/welcomemailboxclient");
         } else {
           const data = await res.json();
           throw new Error(data.error.message);
@@ -84,66 +93,81 @@ const Authentication = () => {
 
   return (
     <>
-      <Container>
-        <Row>
-          <Col xs={6} className="mt-3 mx-auto">
-            <Card>
-              <Card.Header
-                className="p-3"
-                style={{ backgroundColor: "#8F70F1" }}
-              >
-                <h5>{isLogin ? "Login" : "Sign Up"}</h5>
-              </Card.Header>
-              <Card.Body>
-                <Form onSubmit={isLogin ? loginHandler : signUpHandler}>
-                  <Form.Group className="mb-2">
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter Email Address"
-                      ref={inputEmailRef}
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-2">
-                    <Form.Control
-                      type="password"
-                      placeholder="Enter Password"
-                      ref={inputPasswordRef}
-                    />
-                  </Form.Group>
-                  {!isLogin && (
+      {isLoading && (
+        <div className="d-flex justify-content-center vh-100 mt-5">
+          <HashLoader color="#E76660" loading />
+        </div>
+      )}
+      {!isLoading && (
+        <Container>
+          <Row>
+            <Col xs={6} className="mt-3 mx-auto">
+              <Card>
+                <Card.Header
+                  className="p-3"
+                  style={{
+                    backgroundColor: "#E76660",
+                    color: "white",
+                    fontWeight: 500,
+                  }}
+                >
+                  <h5>{isLogin ? "Login" : "Sign Up"}</h5>
+                </Card.Header>
+                <Card.Body>
+                  <Form onSubmit={isLogin ? loginHandler : signUpHandler}>
                     <Form.Group className="mb-2">
                       <Form.Control
                         type="text"
-                        placeholder="Confirm Password"
-                        ref={inputConfirmPasswordRef}
+                        placeholder="Enter Email Address"
+                        ref={inputEmailRef}
                       />
                     </Form.Group>
-                  )}
-                  <Button type="submit">{isLogin ? "Login" : "Sign Up"}</Button>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-      <Container>
-        <Row>
-          <Col xs={6} className="mx-auto mt-2">
-            <Card style={{ backgroundColor: "#BEF9B2", fontWeight: "Bold" }}>
-              <Card.Header>
-                <Link
-                  style={{ textDecoration: "none" }}
-                  onClick={toggleLoginHandler}
-                >
-                  {isLogin
-                    ? "Don't Have an Account? Sign Up"
-                    : "Have an account? Login"}
-                </Link>
-              </Card.Header>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+                    <Form.Group className="mb-2">
+                      <Form.Control
+                        type="password"
+                        placeholder="Enter Password"
+                        ref={inputPasswordRef}
+                      />
+                    </Form.Group>
+                    {!isLogin && (
+                      <Form.Group className="mb-2">
+                        <Form.Control
+                          type="text"
+                          placeholder="Confirm Password"
+                          ref={inputConfirmPasswordRef}
+                        />
+                      </Form.Group>
+                    )}
+                    <Button type="submit">
+                      {isLogin ? "Login" : "Sign Up"}
+                    </Button>
+                  </Form>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      )}
+      {!isLoading && (
+        <Container>
+          <Row>
+            <Col xs={6} className="mx-auto mt-2">
+              <Card style={{ backgroundColor: "#BEF9B2", fontWeight: "Bold" }}>
+                <Card.Header>
+                  <Link
+                    style={{ textDecoration: "none" }}
+                    onClick={toggleLoginHandler}
+                  >
+                    {isLogin
+                      ? "Don't Have an Account? Sign Up"
+                      : "Have an account? Login"}
+                  </Link>
+                </Card.Header>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      )}
     </>
   );
 };
