@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { Container, Card } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { Card, Container } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
 import { PropagateLoader } from "react-spinners";
+import { fetchDataFromServer } from "../store/mail-actions";
 
-const Sentmail = () => {
+const Inbox = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const data = useSelector((state) => state.mail.sentMailItems);
-  const updatedSentMail = Object.values(data).reverse();
+  const inboxMailItems = useSelector((state) => state.mail.inboxMailItems);
+  const updatedMailItems = Object.values(inboxMailItems).reverse();
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(fetchDataFromServer("inboxmail"));
     const fetchData = async () => {
       setTimeout(() => {
         setIsLoading(false);
@@ -24,7 +27,7 @@ const Sentmail = () => {
           <PropagateLoader color="#E76660" />
         </Container>
       )}
-      {Object.values(updatedSentMail).map((mail) => (
+      {Object.values(updatedMailItems).map((mail) => (
         <Card key={mail.id}>
           <Card.Header>{mail.subject}</Card.Header>
           <Card.Body>
@@ -36,4 +39,4 @@ const Sentmail = () => {
   );
 };
 
-export default Sentmail;
+export default Inbox;

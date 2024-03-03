@@ -83,10 +83,12 @@ const Authentication = () => {
           navigate("/welcomemailboxclient");
         } else {
           const data = await res.json();
+          setIsLoading(false);
           throw new Error(data.error.message);
         }
       } catch (err) {
         alert(err);
+        setIsLoading(false);
       }
     }
   };

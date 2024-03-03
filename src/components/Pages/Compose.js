@@ -4,13 +4,17 @@ import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
 import "../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { Button, Container, Form, Row, Col } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { PropagateLoader } from "react-spinners";
+import { sendMailToBackend } from "../store/mail-actions";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 const Compose = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [isSent, setIsSent] = useState(false);
   const email = useSelector((state) => state.auth.userEmail);
+  const dispatch = useDispatch();
 
   const toMailRef = useRef();
   const subjectInputRef = useRef();
@@ -27,40 +31,30 @@ const Compose = () => {
       const rawContentState = convertToRaw(contentState);
       const htmlContent = draftToHtml(rawContentState);
       const mailDetails = {
+        from: email,
         to: toMailRef.current.value,
         subject: subjectInputRef.current.value,
         mailBody: htmlContent,
       };
-      const emailPart = email.split(/@/);
-      const updatedEmail = emailPart[0];
-
-      try {
-        const res = await fetch(
-          `https://mailboxclient-64fb0-default-rtdb.firebaseio.com/sendMail/${updatedEmail}.json`,
-          {
-            method: "POST",
-            body: JSON.stringify(mailDetails),
-            "Content-Type": "application/json",
-          }
-        );
-        if (res.ok) {
-          console.log("Mail Sent Successfully to the Backend!");
-        } else {
-          const data = await res.json();
-          throw new Error(data.error.message);
-        }
-      } catch (err) {
-        alert(err);
-      }
+      dispatch(sendMailToBackend(mailDetails));
     }
     setIsLoading(false);
     toMailRef.current.value = "";
     subjectInputRef.current.value = "";
     setEditorState(EditorState.createEmpty());
+    setIsSent(true);
   };
 
   return (
     <>
+      {isSent && (
+        <p>
+          Mail Sent Successfully
+          <span style={{ color: "green" }}>
+            <RiVerifiedBadgeFill />
+          </span>
+        </p>
+      )}
       {isLoading && (
         <Container className="d-flex justify-content-center vh-100 mt-5">
           <PropagateLoader color="#E76660" />
