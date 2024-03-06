@@ -1,14 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { Card, Container } from "react-bootstrap";
+import { ListGroup, Container, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { PropagateLoader } from "react-spinners";
-import { fetchDataFromServer } from "../store/mail-actions";
+import {
+  fetchDataFromServer,
+  viewMailStatusUpdateToBackend,
+} from "../store/mail-actions";
+import { GoDotFill } from "react-icons/go";
+import { useNavigate } from "react-router-dom";
 
 const Inbox = () => {
   const [isLoading, setIsLoading] = useState(true);
   const inboxMailItems = useSelector((state) => state.mail.inboxMailItems);
   const updatedMailItems = Object.values(inboxMailItems).reverse();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const viewMailHandler = (mail) => {
+    dispatch(viewMailStatusUpdateToBackend(mail));
+    navigate(
+      `/welcomemailboxclient/${mail.id}/${encodeURIComponent(
+        mail.subject
+      )}/${encodeURIComponent(mail.mailBody)}`
+    );
+  };
 
   useEffect(() => {
     dispatch(fetchDataFromServer("inboxmail"));
@@ -27,14 +42,27 @@ const Inbox = () => {
           <PropagateLoader color="#E76660" />
         </Container>
       )}
-      {Object.values(updatedMailItems).map((mail) => (
-        <Card key={mail.id}>
-          <Card.Header>{mail.subject}</Card.Header>
-          <Card.Body>
-            <Card.Text>{mail.mailBody}</Card.Text>
-          </Card.Body>
-        </Card>
-      ))}
+      <ListGroup variant="flush">
+        {Object.values(updatedMailItems).map((mail) => (
+          <ListGroup.Item
+            key={mail.id}
+            onClick={() => viewMailHandler(mail)}
+            style={{ cursor: "pointer" }}
+          >
+            {!mail.seenMail && <GoDotFill style={{ color: "blue" }} />}
+            <Button
+              variant="link"
+              style={{ textDecoration: "none", color: "#B43B35" }}
+            >
+              {mail.subject}{" "}
+              <span>
+                <i>from </i>
+                {mail.from}
+              </span>
+            </Button>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
     </Container>
   );
 };

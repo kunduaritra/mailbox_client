@@ -16,6 +16,7 @@ const Welcome = () => {
   const [isInbox, setIsInbox] = useState(true);
   const dispatch = useDispatch();
   const email = useSelector((state) => state.auth.userEmail);
+  const unreadCount = useSelector((state) => state.mail.unreadCount);
 
   const composeButtonHandler = () => {
     setIsCompose(true);
@@ -37,6 +38,7 @@ const Welcome = () => {
     setIsInbox(false);
     dispatch(fetchDataFromServer("sentmail"));
   };
+
   return (
     <>
       <Container className="mt-5">
@@ -45,6 +47,7 @@ const Welcome = () => {
             <Button onClick={composeButtonHandler}>
               Compose
               <IoMailOpenOutline />
+              <span style={{ fontWeight: 700 }}>{unreadCount}</span>
             </Button>
             <Col className="mt-2">
               <Link

@@ -48,3 +48,32 @@ export const fetchDataFromServer = (mailType) => {
     }
   };
 };
+
+export const viewMailStatusUpdateToBackend = (mail) => {
+  return async (dispatch) => {
+    try {
+      const res = await fetch(
+        `https://mailboxclient-64fb0-default-rtdb.firebaseio.com/allmail/${mail.id}.json`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            from: mail.from,
+            mailBody: mail.mailBody,
+            subject: mail.subject,
+            to: mail.to,
+            seenMail: true,
+          }),
+          "Content-Type": "appliaction/json",
+        }
+      );
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error.message);
+      } else {
+        dispatch(mailSliceActions.viewMail(mail));
+      }
+    } catch (err) {
+      alert(err);
+    }
+  };
+};

@@ -1,6 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialMailState = { sentMailItems: [], inboxMailItems: [] };
+const initialMailState = {
+  sentMailItems: [],
+  inboxMailItems: [],
+  unreadCount: 0,
+};
 
 const mailSlice = createSlice({
   name: "mail",
@@ -20,11 +24,22 @@ const mailSlice = createSlice({
       state.inboxMailItems = [];
       const data = action.payload;
       const email = localStorage.getItem("userEmail");
+      let count = 0;
       Object.entries(data).forEach(([id, item]) => {
         if (item.to === email) {
           state.inboxMailItems = [...state.inboxMailItems, { id: id, ...item }];
+          if (!item.seenMail) {
+            count++;
+          }
         }
       });
+      state.unreadCount = count;
+    },
+    viewMail(state, action) {
+      const mail = action.payload;
+      state.inboxMailItems = state.inboxMailItems.map((item) =>
+        item.id === mail.id ? mail : item
+      );
     },
   },
 });

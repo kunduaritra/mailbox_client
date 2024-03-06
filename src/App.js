@@ -8,6 +8,7 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
+import Viewmail from "./components/Pages/Viewmail";
 
 function App() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -24,6 +25,10 @@ function App() {
                 {!isAuthenticated && <Navigate to="/" />}
               </>
             }
+          />
+          <Route
+            path="welcomemailboxclient/:id/:subject/:content"
+            element={<Viewmail />}
           />
         </Route>
       </Routes>

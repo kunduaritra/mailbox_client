@@ -35,6 +35,7 @@ const Compose = () => {
         to: toMailRef.current.value,
         subject: subjectInputRef.current.value,
         mailBody: htmlContent,
+        seenMail: false,
       };
       dispatch(sendMailToBackend(mailDetails));
     }
