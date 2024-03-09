@@ -77,3 +77,23 @@ export const viewMailStatusUpdateToBackend = (mail) => {
     }
   };
 };
+
+export const deleteMailFromBackend = (mail) => {
+  return async (dispatch) => {
+    try {
+      const res = await fetch(
+        `https://mailboxclient-64fb0-default-rtdb.firebaseio.com/allmail/${mail.id}.json`,
+        { method: "DELETE" }
+      );
+      if (res.ok) {
+        console.log("deleted successfully");
+        dispatch(mailSliceActions.deleteMail(mail));
+      } else {
+        const resData = await res.json();
+        throw new Error(resData.error.message);
+      }
+    } catch (err) {
+      alert(err);
+    }
+  };
+};

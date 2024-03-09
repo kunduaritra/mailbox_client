@@ -41,6 +41,15 @@ const mailSlice = createSlice({
         item.id === mail.id ? mail : item
       );
     },
+    deleteMail(state, action) {
+      const deleteMail = action.payload;
+      state.inboxMailItems = state.inboxMailItems.filter(
+        (mail) => deleteMail.id !== mail.id
+      );
+      if (deleteMail.seenMail === false) {
+        state.unreadCount--;
+      }
+    },
   },
 });
 

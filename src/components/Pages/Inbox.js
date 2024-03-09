@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { ListGroup, Container, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { PropagateLoader } from "react-spinners";
+import { MdDelete } from "react-icons/md";
 import {
+  deleteMailFromBackend,
   fetchDataFromServer,
   viewMailStatusUpdateToBackend,
 } from "../store/mail-actions";
@@ -25,6 +27,10 @@ const Inbox = () => {
     );
   };
 
+  const deleteMail = (mail) => {
+    dispatch(deleteMailFromBackend(mail));
+  };
+
   useEffect(() => {
     dispatch(fetchDataFromServer("inboxmail"));
     const fetchData = async () => {
@@ -44,14 +50,11 @@ const Inbox = () => {
       )}
       <ListGroup variant="flush">
         {Object.values(updatedMailItems).map((mail) => (
-          <ListGroup.Item
-            key={mail.id}
-            onClick={() => viewMailHandler(mail)}
-            style={{ cursor: "pointer" }}
-          >
+          <ListGroup.Item key={mail.id} style={{ cursor: "pointer" }}>
             {!mail.seenMail && <GoDotFill style={{ color: "blue" }} />}
             <Button
               variant="link"
+              onClick={() => viewMailHandler(mail)}
               style={{ textDecoration: "none", color: "#B43B35" }}
             >
               {mail.subject}{" "}
@@ -60,6 +63,10 @@ const Inbox = () => {
                 {mail.from}
               </span>
             </Button>
+            <MdDelete
+              onClick={() => deleteMail(mail)}
+              style={{ color: "red", marginLeft: "8px" }}
+            />
           </ListGroup.Item>
         ))}
       </ListGroup>

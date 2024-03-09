@@ -16,7 +16,15 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<RootLayout />}>
-          <Route path="/" element={<Authentication />} />
+          <Route
+            path="/"
+            element={
+              <>
+                {!isAuthenticated && <Authentication />}
+                {isAuthenticated && <Navigate to="welcomemailboxclient" />}
+              </>
+            }
+          />
           <Route
             path="/welcomemailboxclient"
             element={
