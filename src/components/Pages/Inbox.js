@@ -32,6 +32,12 @@ const Inbox = () => {
   };
 
   useEffect(() => {
+    setTimeout(() => {
+      dispatch(fetchDataFromServer("inboxmail"));
+    }, 2000);
+  });
+
+  useEffect(() => {
     dispatch(fetchDataFromServer("inboxmail"));
     const fetchData = async () => {
       setTimeout(() => {
