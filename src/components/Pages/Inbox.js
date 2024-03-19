@@ -10,13 +10,17 @@ import {
 } from "../store/mail-actions";
 import { GoDotFill } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
+import useFetch from "../hooks/useFetch";
 
 const Inbox = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const inboxMailItems = useSelector((state) => state.mail.inboxMailItems);
+  let inboxMailItems = useSelector((state) => state.mail.inboxMailItems);
   const updatedMailItems = Object.values(inboxMailItems).reverse();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  inboxMailItems = useFetch(
+    "https://mailboxclient-64fb0-default-rtdb.firebaseio.com/allmail.json"
+  );
 
   const viewMailHandler = (mail) => {
     dispatch(viewMailStatusUpdateToBackend(mail));
